@@ -19,6 +19,7 @@ public class Model {
 	
 	private EventsDao dao;
 	private Graph<Integer, DefaultWeightedEdge> grafo;
+	private Simulator sim;
 	
 	public Model() {
 		this.dao = new EventsDao();
@@ -28,6 +29,22 @@ public class Model {
 		List<Integer> anni = this.dao.getAnni();
 		Collections.sort(anni);
 		return anni;
+	}
+	
+	public List<Integer> getMesi(int anno) {
+		return this.dao.getMesi(anno);
+	}
+	
+	public List<Integer> getGiorni(int anno, int mese) {
+		return this.dao.getGiorni(anno, mese);
+	}
+	
+	public Integer distrettoMinimo(int anno) {
+		return this.dao.distrettoMinimo(anno);
+	}
+	
+	public List<Event> getEventsByAnnoMeseGiorno(int anno, int mese, int giorno) {
+		return dao.getEventsByAnnoMeseGiorno(anno, mese, giorno);
 	}
 	
 	public void creaGrafo(int anno) {
@@ -68,5 +85,19 @@ public class Model {
 		}
 		Collections.sort(vicini);
 		return vicini;
+	}
+	
+	public void simula(int anno, int mese, int giorno, int numeroAgenti) {
+		sim = new Simulator(this, this.grafo);
+		sim.setAnno(anno);
+		sim.setGiorno(giorno);
+		sim.setMese(mese);
+		sim.setNumeroAgenti(numeroAgenti);
+		sim.init();
+		sim.run();
+	}
+	
+	public int getMalgestiti() {
+		return this.sim.getMalgestiti();
 	}
 }

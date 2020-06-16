@@ -18,6 +18,7 @@ import javafx.scene.control.TextField;
 
 public class FXMLController {
 	private Model model;
+	private int anno;
 
     @FXML // ResourceBundle that was given to the FXMLLoader
     private ResourceBundle resources;
@@ -29,10 +30,10 @@ public class FXMLController {
     private ComboBox<Integer> boxAnno; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxMese"
-    private ComboBox<?> boxMese; // Value injected by FXMLLoader
+    private ComboBox<Integer> boxMese; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxGiorno"
-    private ComboBox<?> boxGiorno; // Value injected by FXMLLoader
+    private ComboBox<Integer> boxGiorno; // Value injected by FXMLLoader
 
     @FXML // fx:id="btnCreaReteCittadina"
     private Button btnCreaReteCittadina; // Value injected by FXMLLoader
@@ -54,6 +55,7 @@ public class FXMLController {
     		return;
     	}
     	Integer anno = this.boxAnno.getValue();
+    	this.anno = anno;
     	
     	this.model.creaGrafo(anno);
     	
@@ -68,10 +70,65 @@ public class FXMLController {
     		}
     		this.txtResult.appendText("\n");
     	}
+    	
+    	this.boxMese.getItems().clear();
+    	this.boxMese.getItems().addAll(this.model.getMesi(anno));
+    }
+    
+    @FXML
+    void doAggiungiGiorni(ActionEvent event) {
+    	Integer anno = this.boxAnno.getValue();
+    	if(anno == null) {
+    		this.txtResult.appendText("Errore! Devi selezionare un anno dall'apposito combobox!\n");
+    		return;
+    	}
+    	Integer mese = this.boxMese.getValue();
+    	if(mese == null) {
+    		this.txtResult.appendText("Errore! Devi selezionare un mese dall'apposito combobox!\n");
+    		return;
+    	}
+    	
+    	this.boxGiorno.getItems().clear();
+    	this.boxGiorno.getItems().addAll(this.model.getGiorni(anno, mese));
     }
 
     @FXML
     void doSimula(ActionEvent event) {
+    	this.txtResult.clear();
+    	Integer anno = this.boxAnno.getValue();
+    	if(anno == null) {
+    		this.txtResult.appendText("Errore! Devi selezionare un anno dall'apposito combobox!\n");
+    		return;
+    	}
+    	else if(this.anno != anno) {
+    		this.txtResult.appendText("Errore! L'anno deve essere uguale a quello inserito per la creazione del grafo!\n");
+    		return;
+    	}
+    	Integer mese = this.boxMese.getValue();
+    	if(mese == null) {
+    		this.txtResult.appendText("Errore! Devi selezionare un mese dall'apposito combobox!\n");
+    		return;
+    	}
+    	Integer giorno = this.boxGiorno.getValue();
+    	if(giorno == null) {
+    		this.txtResult.appendText("Errore! Devi selezionare un giorno dall'apposito combobox\n");
+    		return;
+    	}
+    	Integer numeroAgenti;
+    	try {
+    		numeroAgenti = Integer.parseInt(this.txtN.getText());
+    		if(numeroAgenti < 1 || numeroAgenti > 10) {
+    			this.txtResult.appendText("Errore! Sono ammissibili solo valori di N compresi tra 1 e 10!");
+        		return;
+    		}
+    	} catch(NumberFormatException e) {
+    		this.txtResult.appendText("Errore! Devi inserire un valore numerico intero per N!");
+    		return;
+    	}
+    	
+    	this.model.simula(anno, mese, giorno, numeroAgenti);
+    	this.txtResult.appendText("Simulo con " + numeroAgenti + " agenti\n");
+    	this.txtResult.appendText("NUMERO DEI CRIMINI MAL GESTITI: " + this.model.getMalgestiti());
 
     }
 
